@@ -30,6 +30,12 @@
 			"transformations": [
 				{
 					"name": "InnerJoinWithOrderLines"
+				},
+				{
+					"name": "InnerJoinWithSalesOrders"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -112,7 +118,44 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoinWithOrderLines"
+				"     broadcast: 'auto')~> InnerJoinWithOrderLines",
+				"SalesCustomerCSV, InnerJoinWithOrderLines join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> InnerJoinWithSalesOrders",
+				"InnerJoinWithOrderLines select(mapColumn(",
+				"          OrderID = SalesOrdersCSV@OrderID,",
+				"          CustomerID,",
+				"          SalespersonPersonID,",
+				"          PickedByPersonID,",
+				"          ContactPersonID,",
+				"          BackorderOrderID,",
+				"          OrderDate,",
+				"          ExpectedDeliveryDate,",
+				"          CustomerPurchaseOrderNumber,",
+				"          IsUndersupplyBackordered,",
+				"          Comments,",
+				"          DeliveryInstructions,",
+				"          InternalComments,",
+				"          PickingCompletedWhen = SalesOrdersCSV@PickingCompletedWhen,",
+				"          LastEditedBy = SalesOrdersCSV@LastEditedBy,",
+				"          LastEditedWhen = SalesOrdersCSV@LastEditedWhen,",
+				"          OrderLineID,",
+				"          OrderID = SalesOrderLinesCSV@OrderID,",
+				"          StockItemID,",
+				"          Description,",
+				"          PackageTypeID,",
+				"          Quantity,",
+				"          UnitPrice,",
+				"          TaxRate,",
+				"          PickedQuantity,",
+				"          PickingCompletedWhen = SalesOrderLinesCSV@PickingCompletedWhen,",
+				"          LastEditedBy = SalesOrderLinesCSV@LastEditedBy,",
+				"          LastEditedWhen = SalesOrderLinesCSV@LastEditedWhen",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1"
 			]
 		}
 	}
