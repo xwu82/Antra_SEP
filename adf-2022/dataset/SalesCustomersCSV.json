@@ -1,0 +1,147 @@
+{
+	"name": "SalesCustomersCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CustomerID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "CustomerName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BillToCustomerID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "CustomerCategoryID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "BuyingGroupID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PrimaryContactPersonID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AlternateContactPersonID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DeliveryMethodID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "DeliveryCityID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PostalCityID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CreditLimit",
+				"type": "nvarchar"
+			},
+			{
+				"name": "AccountOpenedDate",
+				"type": "date"
+			},
+			{
+				"name": "StandardDiscountPercentage",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "IsStatementSent",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "IsOnCreditHold",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "PaymentDays",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "PhoneNumber",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FaxNumber",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DeliveryRun",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RunPosition",
+				"type": "nvarchar"
+			},
+			{
+				"name": "WebsiteURL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DeliveryAddressLine1",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DeliveryAddressLine2",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DeliveryPostalCode",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DeliveryLocation",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PostalAddressLine1",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PostalAddressLine2",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PostalPostalCode",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "tinyint",
+				"precision": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "SalesCustomers"
+		}
+	}
+}

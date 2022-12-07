@@ -1,0 +1,98 @@
+{
+	"name": "ApplicationPeopleCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "PersonID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "FullName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PreferredName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SearchName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsPermittedToLogon",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LogonName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsExternalLogonProvider",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "HashedPassword",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsSystemUser",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsEmployee",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "IsSalesperson",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "UserPreferences",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PhoneNumber",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FaxNumber",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EmailAddress",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Photo",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CustomFields",
+				"type": "nvarchar"
+			},
+			{
+				"name": "OtherLanguages",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "tinyint",
+				"precision": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ApplicationPeople"
+		}
+	}
+}

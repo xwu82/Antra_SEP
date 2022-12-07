@@ -1,0 +1,119 @@
+{
+	"name": "WarehouseStockItemsCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "StockItemID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "StockItemName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SupplierID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "ColorID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "UnitPackageID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "OuterPackageID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Brand",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Size",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LeadTimeDays",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "QuantityPerOuter",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "IsChillerStock",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Barcode",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TaxRate",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "UnitPrice",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "RecommendedRetailPrice",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TypicalWeightPerUnit",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "MarketingComments",
+				"type": "nvarchar"
+			},
+			{
+				"name": "InternalComments",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Photo",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CustomFields",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Tags",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SearchDetails",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "tinyint",
+				"precision": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "WarehouseStockItems"
+		}
+	}
+}

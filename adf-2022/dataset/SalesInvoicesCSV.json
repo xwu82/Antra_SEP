@@ -1,0 +1,131 @@
+{
+	"name": "SalesInvoicesCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "InvoiceID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CustomerID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "BillToCustomerID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "OrderID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DeliveryMethodID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "ContactPersonID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AccountsPersonID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "SalespersonPersonID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "PackedByPersonID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "InvoiceDate",
+				"type": "date"
+			},
+			{
+				"name": "CustomerPurchaseOrderNumber",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "IsCreditNote",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "CreditNoteReason",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Comments",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DeliveryInstructions",
+				"type": "nvarchar"
+			},
+			{
+				"name": "InternalComments",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TotalDryItems",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "TotalChillerItems",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "DeliveryRun",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RunPosition",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ReturnedDeliveryData",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ConfirmedDeliveryTime",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ConfirmedReceivedBy",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "LastEditedWhen",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "SalesInvoices"
+		}
+	}
+}
