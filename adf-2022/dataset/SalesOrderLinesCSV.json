@@ -1,0 +1,74 @@
+{
+	"name": "SalesOrderLinesCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "OrderLineID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "OrderID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StockItemID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Description",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PackageTypeID",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "Quantity",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "UnitPrice",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "TaxRate",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "PickedQuantity",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "PickingCompletedWhen",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "LastEditedWhen",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "SalesOrderLines"
+		}
+	}
+}

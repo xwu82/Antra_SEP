@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "SalesOrdersCSV",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SQLDB",

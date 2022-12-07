@@ -1,0 +1,77 @@
+{
+	"name": "JoinAndAggregateData",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SalesOrdersCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SalesOrdersCSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "SalesOrderLinesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SalesOrderLinesCSV"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "InnerJoinWithOrderLines"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          OrderID as integer,",
+				"          CustomerID as integer,",
+				"          SalespersonPersonID as integer,",
+				"          PickedByPersonID as string,",
+				"          ContactPersonID as integer,",
+				"          BackorderOrderID as string,",
+				"          OrderDate as date,",
+				"          ExpectedDeliveryDate as date,",
+				"          CustomerPurchaseOrderNumber as integer,",
+				"          IsUndersupplyBackordered as integer,",
+				"          Comments as string,",
+				"          DeliveryInstructions as string,",
+				"          InternalComments as string,",
+				"          PickingCompletedWhen as string,",
+				"          LastEditedBy as integer,",
+				"          LastEditedWhen as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SalesOrdersCSV",
+				"source(output(",
+				"          OrderLineID as integer,",
+				"          OrderID as integer,",
+				"          StockItemID as integer,",
+				"          Description as string,",
+				"          PackageTypeID as integer,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TaxRate as double,",
+				"          PickedQuantity as integer,",
+				"          PickingCompletedWhen as string,",
+				"          LastEditedBy as integer,",
+				"          LastEditedWhen as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SalesOrderLinesCSV",
+				"SalesOrdersCSV, SalesOrderLinesCSV join(SalesOrdersCSV@OrderID == SalesOrderLinesCSV@OrderID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> InnerJoinWithOrderLines"
+			]
+		}
+	}
+}
