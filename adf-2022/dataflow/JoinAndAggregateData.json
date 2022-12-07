@@ -35,7 +35,7 @@
 					"name": "InnerJoinWithSalesOrders"
 				},
 				{
-					"name": "select1"
+					"name": "select"
 				}
 			],
 			"scriptLines": [
@@ -155,7 +155,7 @@
 				"          LastEditedWhen = SalesOrderLinesCSV@LastEditedWhen",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"     skipDuplicateMapOutputs: true) ~> select"
 			]
 		}
 	}
