@@ -31,6 +31,27 @@
 						"type": "DatasetReference"
 					},
 					"name": "SalesInvoicesCSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "ApplicationPeopleCSV",
+						"type": "DatasetReference"
+					},
+					"name": "ApplicationPeopleCSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "WarehousePackageTypesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "WarehousePackageTypesCSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "WarehouseStockItemsCSV",
+						"type": "DatasetReference"
+					},
+					"name": "WarehouseStockItemsCSV"
 				}
 			],
 			"sinks": [],
@@ -46,6 +67,15 @@
 				},
 				{
 					"name": "Innerjoin3"
+				},
+				{
+					"name": "Innerjoin4"
+				},
+				{
+					"name": "InnerJoin5"
+				},
+				{
+					"name": "InnerJoin6"
 				}
 			],
 			"scriptLines": [
@@ -155,6 +185,69 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SalesInvoicesCSV",
+				"source(output(",
+				"          PersonID as integer,",
+				"          FullName as string,",
+				"          PreferredName as string,",
+				"          SearchName as string,",
+				"          IsPermittedToLogon as string,",
+				"          LogonName as string,",
+				"          IsExternalLogonProvider as integer,",
+				"          HashedPassword as string,",
+				"          IsSystemUser as string,",
+				"          IsEmployee as integer,",
+				"          IsSalesperson as integer,",
+				"          UserPreferences as string,",
+				"          PhoneNumber as string,",
+				"          FaxNumber as string,",
+				"          EmailAddress as string,",
+				"          Photo as string,",
+				"          CustomFields as string,",
+				"          OtherLanguages as string,",
+				"          LastEditedBy as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> ApplicationPeopleCSV",
+				"source(output(",
+				"          PackageTypeID as integer,",
+				"          PackageTypeName as string,",
+				"          LastEditedBy as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> WarehousePackageTypesCSV",
+				"source(output(",
+				"          StockItemID as integer,",
+				"          StockItemName as string,",
+				"          SupplierID as integer,",
+				"          ColorID as string,",
+				"          UnitPackageID as integer,",
+				"          OuterPackageID as integer,",
+				"          Brand as string,",
+				"          Size as string,",
+				"          LeadTimeDays as integer,",
+				"          QuantityPerOuter as integer,",
+				"          IsChillerStock as string,",
+				"          Barcode as string,",
+				"          TaxRate as double,",
+				"          UnitPrice as double,",
+				"          RecommendedRetailPrice as string,",
+				"          TypicalWeightPerUnit as double,",
+				"          MarketingComments as string,",
+				"          InternalComments as string,",
+				"          Photo as string,",
+				"          CustomFields as string,",
+				"          Tags as string,",
+				"          SearchDetails as string,",
+				"          LastEditedBy as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> WarehouseStockItemsCSV",
 				"SalesOrdersCSV, SalesOrderLinesCSV join(SalesOrdersCSV@OrderID == SalesOrderLinesCSV@OrderID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
@@ -175,7 +268,22 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> Innerjoin3"
+				"     broadcast: 'auto')~> Innerjoin3",
+				"ApplicationPeopleCSV, Innerjoin3 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> Innerjoin4",
+				"WarehousePackageTypesCSV, Innerjoin4 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> InnerJoin5",
+				"WarehouseStockItemsCSV, InnerJoin5 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> InnerJoin6"
 			]
 		}
 	}
