@@ -13,10 +13,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": {
-					"value": "@dataset().Folder",
-					"type": "Expression"
-				},
 				"container": "adf-container1"
 			},
 			"columnDelimiter": ",",
