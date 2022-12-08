@@ -79,6 +79,10 @@
 				"name": "LastEditedWhen",
 				"type": "nvarchar"
 			}
-		]
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Sales.Orders"
+		}
 	}
 }
