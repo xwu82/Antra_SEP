@@ -57,16 +57,16 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "InnerJoin1"
+					"name": "Join1"
 				},
 				{
-					"name": "InnerJoin2"
+					"name": "Join2"
 				},
 				{
 					"name": "select"
 				},
 				{
-					"name": "Innerjoin3"
+					"name": "join3"
 				},
 				{
 					"name": "Innerjoin4"
@@ -252,34 +252,34 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoin1",
-				"SalesCustomerCSV, InnerJoin1 join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
+				"     broadcast: 'auto')~> Join1",
+				"SalesCustomerCSV, Join1 join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoin2",
-				"InnerJoin1 select(mapColumn(",
+				"     broadcast: 'auto')~> Join2",
+				"Join1 select(mapColumn(",
 				"          OrderID = SalesOrdersCSV@OrderID,",
 				"          CustomerID",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select",
-				"SalesInvoicesCSV, InnerJoin2 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"SalesInvoicesCSV, Join2 join(SalesInvoicesCSV@CustomerID == SalesCustomerCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> Innerjoin3",
-				"ApplicationPeopleCSV, Innerjoin3 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     broadcast: 'auto')~> join3",
+				"ApplicationPeopleCSV, join3 join(PersonID == SalesInvoicesCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> Innerjoin4",
-				"WarehousePackageTypesCSV, Innerjoin4 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"WarehousePackageTypesCSV, Innerjoin4 join(WarehousePackageTypesCSV@PackageTypeID == SalesOrderLinesCSV@PackageTypeID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> InnerJoin5",
-				"WarehouseStockItemsCSV, InnerJoin5 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"WarehouseStockItemsCSV, InnerJoin5 join(WarehouseStockItemsCSV@StockItemID == SalesOrderLinesCSV@StockItemID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
