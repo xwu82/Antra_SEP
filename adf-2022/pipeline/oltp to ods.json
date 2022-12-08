@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "oltp to ods",
+				"name": "SalesOrders",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -45,6 +45,12 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": []
 			}
 		],
 		"annotations": []
