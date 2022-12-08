@@ -81,7 +81,8 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "dbo"
+			"schema": "dbo",
+			"table": "Sales.Orders"
 		}
 	}
 }
