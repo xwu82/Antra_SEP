@@ -24,18 +24,28 @@
 						"type": "DatasetReference"
 					},
 					"name": "SalesCustomerCSV"
+				},
+				{
+					"dataset": {
+						"referenceName": "SalesInvoicesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "SalesInvoicesCSV"
 				}
 			],
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "InnerJoinWithOrderLines"
+					"name": "InnerJoin1"
 				},
 				{
-					"name": "InnerJoinWithSalesOrders"
+					"name": "InnerJoin2"
 				},
 				{
 					"name": "select"
+				},
+				{
+					"name": "Innerjoin3"
 				}
 			],
 			"scriptLines": [
@@ -114,22 +124,58 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SalesCustomerCSV",
+				"source(output(",
+				"          InvoiceID as integer,",
+				"          CustomerID as integer,",
+				"          BillToCustomerID as integer,",
+				"          OrderID as integer,",
+				"          DeliveryMethodID as integer,",
+				"          ContactPersonID as integer,",
+				"          AccountsPersonID as integer,",
+				"          SalespersonPersonID as integer,",
+				"          PackedByPersonID as integer,",
+				"          InvoiceDate as date,",
+				"          CustomerPurchaseOrderNumber as integer,",
+				"          IsCreditNote as integer,",
+				"          CreditNoteReason as string,",
+				"          Comments as string,",
+				"          DeliveryInstructions as string,",
+				"          InternalComments as string,",
+				"          TotalDryItems as integer,",
+				"          TotalChillerItems as integer,",
+				"          DeliveryRun as string,",
+				"          RunPosition as string,",
+				"          ReturnedDeliveryData as string,",
+				"          ConfirmedDeliveryTime as string,",
+				"          ConfirmedReceivedBy as string,",
+				"          LastEditedBy as integer,",
+				"          LastEditedWhen as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SalesInvoicesCSV",
 				"SalesOrdersCSV, SalesOrderLinesCSV join(SalesOrdersCSV@OrderID == SalesOrderLinesCSV@OrderID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoinWithOrderLines",
-				"SalesCustomerCSV, InnerJoinWithOrderLines join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
+				"     broadcast: 'auto')~> InnerJoin1",
+				"SalesCustomerCSV, InnerJoin1 join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoinWithSalesOrders",
-				"InnerJoinWithOrderLines select(mapColumn(",
+				"     broadcast: 'auto')~> InnerJoin2",
+				"InnerJoin1 select(mapColumn(",
 				"          OrderID = SalesOrdersCSV@OrderID,",
 				"          CustomerID",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select"
+				"     skipDuplicateMapOutputs: true) ~> select",
+				"SalesInvoicesCSV, InnerJoin2 join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> Innerjoin3"
 			]
 		}
 	}
