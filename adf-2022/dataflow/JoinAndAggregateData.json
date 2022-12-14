@@ -57,16 +57,13 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "Join1"
+					"name": "InnerJoin1"
 				},
 				{
-					"name": "Join2"
+					"name": "InnerJoin2"
 				},
 				{
-					"name": "select"
-				},
-				{
-					"name": "join3"
+					"name": "Innerjoin3"
 				},
 				{
 					"name": "Innerjoin4"
@@ -76,6 +73,9 @@
 				},
 				{
 					"name": "InnerJoin6"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -252,24 +252,18 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> Join1",
-				"SalesCustomerCSV, Join1 join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
+				"     broadcast: 'auto')~> InnerJoin1",
+				"SalesCustomerCSV, InnerJoin1 join(SalesCustomerCSV@CustomerID == SalesOrdersCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> Join2",
-				"Join1 select(mapColumn(",
-				"          OrderID = SalesOrdersCSV@OrderID,",
-				"          CustomerID",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select",
-				"SalesInvoicesCSV, Join2 join(SalesInvoicesCSV@CustomerID == SalesCustomerCSV@CustomerID,",
+				"     broadcast: 'auto')~> InnerJoin2",
+				"SalesInvoicesCSV, InnerJoin2 join(SalesInvoicesCSV@CustomerID == SalesCustomerCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join3",
-				"ApplicationPeopleCSV, join3 join(PersonID == SalesInvoicesCSV@CustomerID,",
+				"     broadcast: 'auto')~> Innerjoin3",
+				"ApplicationPeopleCSV, Innerjoin3 join(PersonID == SalesInvoicesCSV@CustomerID,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -283,7 +277,13 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoin6"
+				"     broadcast: 'auto')~> InnerJoin6",
+				"InnerJoin6 select(mapColumn(",
+				"          each(match(/* All input columns */ true()),",
+				"               /* Input name */ $$ = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1"
 			]
 		}
 	}
