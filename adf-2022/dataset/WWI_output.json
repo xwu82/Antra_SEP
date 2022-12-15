@@ -1,0 +1,99 @@
+{
+	"name": "WWI_output",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "adf-container1"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "PersonID",
+				"type": "String"
+			},
+			{
+				"name": "FullName",
+				"type": "String"
+			},
+			{
+				"name": "PreferredName",
+				"type": "String"
+			},
+			{
+				"name": "SearchName",
+				"type": "String"
+			},
+			{
+				"name": "IsPermittedToLogon",
+				"type": "String"
+			},
+			{
+				"name": "LogonName",
+				"type": "String"
+			},
+			{
+				"name": "IsExternalLogonProvider",
+				"type": "String"
+			},
+			{
+				"name": "HashedPassword",
+				"type": "String"
+			},
+			{
+				"name": "IsSystemUser",
+				"type": "String"
+			},
+			{
+				"name": "IsEmployee",
+				"type": "String"
+			},
+			{
+				"name": "IsSalesperson",
+				"type": "String"
+			},
+			{
+				"name": "UserPreferences",
+				"type": "String"
+			},
+			{
+				"name": "PhoneNumber",
+				"type": "String"
+			},
+			{
+				"name": "FaxNumber",
+				"type": "String"
+			},
+			{
+				"name": "EmailAddress",
+				"type": "String"
+			},
+			{
+				"name": "Photo",
+				"type": "String"
+			},
+			{
+				"name": "CustomFields",
+				"type": "String"
+			},
+			{
+				"name": "OtherLanguages",
+				"type": "String"
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "String"
+			}
+		]
+	}
+}

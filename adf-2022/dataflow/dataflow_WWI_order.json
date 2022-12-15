@@ -1,5 +1,5 @@
 {
-	"name": "dataflow_WWI",
+	"name": "dataflow_WWI_order",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -26,7 +26,15 @@
 					"name": "SalesOrderLines"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "WWI_output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "select1"
@@ -197,7 +205,34 @@
 				"          DeliveryPostalCode",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select4"
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          PersonID as string,",
+				"          FullName as string,",
+				"          PreferredName as string,",
+				"          SearchName as string,",
+				"          IsPermittedToLogon as string,",
+				"          LogonName as string,",
+				"          IsExternalLogonProvider as string,",
+				"          HashedPassword as string,",
+				"          IsSystemUser as string,",
+				"          IsEmployee as string,",
+				"          IsSalesperson as string,",
+				"          UserPreferences as string,",
+				"          PhoneNumber as string,",
+				"          FaxNumber as string,",
+				"          EmailAddress as string,",
+				"          Photo as string,",
+				"          CustomFields as string,",
+				"          OtherLanguages as string,",
+				"          LastEditedBy as string",
+				"     ),",
+				"     partitionFileNames:['WWI_order.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
