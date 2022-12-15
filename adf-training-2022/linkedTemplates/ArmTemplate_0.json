@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
 		},
+		"OutputDatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'OutputDatabase'"
+		},
 		"SQLDB_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SQLDB'"
@@ -59,6 +63,19 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/OutputDatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('OutputDatabase_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SQLDB')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -72,7 +89,477 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"name": "[concat(parameters('factoryName'), '/ApplicationPeopleCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PersonID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "FullName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PreferredName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SearchName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IsPermittedToLogon",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LogonName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IsExternalLogonProvider",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "HashedPassword",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IsSystemUser",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IsEmployee",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "IsSalesperson",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UserPreferences",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FaxNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Photo",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomFields",
+						"type": "nvarchar"
+					},
+					{
+						"name": "OtherLanguages",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "tinyint",
+						"precision": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ApplicationPeople"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesCustomersCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "CustomerName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BillToCustomerID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "CustomerCategoryID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "BuyingGroupID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PrimaryContactPersonID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "AlternateContactPersonID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeliveryMethodID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "DeliveryCityID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PostalCityID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CreditLimit",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccountOpenedDate",
+						"type": "date"
+					},
+					{
+						"name": "StandardDiscountPercentage",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "IsStatementSent",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "IsOnCreditHold",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "PaymentDays",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FaxNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeliveryRun",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RunPosition",
+						"type": "nvarchar"
+					},
+					{
+						"name": "WebsiteURL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeliveryAddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeliveryAddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeliveryPostalCode",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DeliveryLocation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalAddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalAddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalPostalCode",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "tinyint",
+						"precision": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "SalesCustomers"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesInvoicesCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "InvoiceID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "BillToCustomerID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "OrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DeliveryMethodID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "ContactPersonID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "AccountsPersonID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "SalespersonPersonID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "PackedByPersonID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "InvoiceDate",
+						"type": "date"
+					},
+					{
+						"name": "CustomerPurchaseOrderNumber",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "IsCreditNote",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "CreditNoteReason",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Comments",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeliveryInstructions",
+						"type": "nvarchar"
+					},
+					{
+						"name": "InternalComments",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TotalDryItems",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "TotalChillerItems",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "DeliveryRun",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RunPosition",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ReturnedDeliveryData",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ConfirmedDeliveryTime",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ConfirmedReceivedBy",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "LastEditedWhen",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "SalesInvoices"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrderLinesCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "OrderLineID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StockItemID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Description",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PackageTypeID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Quantity",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UnitPrice",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "TaxRate",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "PickedQuantity",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "PickingCompletedWhen",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "LastEditedWhen",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "SalesOrderLines"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrdersCSV')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -165,41 +652,525 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"name": "[concat(parameters('factoryName'), '/WWI_output')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ADLSGen2",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileSystem": "adlscontainer"
+						"type": "AzureBlobStorageLocation",
+						"container": "adf-container1"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "PersonID",
+						"type": "String"
+					},
+					{
+						"name": "FullName",
+						"type": "String"
+					},
+					{
+						"name": "PreferredName",
+						"type": "String"
+					},
+					{
+						"name": "SearchName",
+						"type": "String"
+					},
+					{
+						"name": "IsPermittedToLogon",
+						"type": "String"
+					},
+					{
+						"name": "LogonName",
+						"type": "String"
+					},
+					{
+						"name": "IsExternalLogonProvider",
+						"type": "String"
+					},
+					{
+						"name": "HashedPassword",
+						"type": "String"
+					},
+					{
+						"name": "IsSystemUser",
+						"type": "String"
+					},
+					{
+						"name": "IsEmployee",
+						"type": "String"
+					},
+					{
+						"name": "IsSalesperson",
+						"type": "String"
+					},
+					{
+						"name": "UserPreferences",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "FaxNumber",
+						"type": "String"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "String"
+					},
+					{
+						"name": "Photo",
+						"type": "String"
+					},
+					{
+						"name": "CustomFields",
+						"type": "String"
+					},
+					{
+						"name": "OtherLanguages",
+						"type": "String"
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ADLSGen2')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/oltp to ods')]",
+			"name": "[concat(parameters('factoryName'), '/WarehousePackageTypesCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "PackageTypeID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "PackageTypeName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "tinyint",
+						"precision": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WarehousePackageTypes"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WarehouseStockItemsCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "StockItemID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "StockItemName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SupplierID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "ColorID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UnitPackageID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OuterPackageID",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "Brand",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Size",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LeadTimeDays",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "QuantityPerOuter",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "IsChillerStock",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Barcode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TaxRate",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "UnitPrice",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "RecommendedRetailPrice",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TypicalWeightPerUnit",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "MarketingComments",
+						"type": "nvarchar"
+					},
+					{
+						"name": "InternalComments",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Photo",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomFields",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Tags",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SearchDetails",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastEditedBy",
+						"type": "tinyint",
+						"precision": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WarehouseStockItems"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow_WWI_order')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SalesOrdersCSV",
+								"type": "DatasetReference"
+							},
+							"name": "SalesOrders"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesCustomersCSV",
+								"type": "DatasetReference"
+							},
+							"name": "SalesCustomers"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesOrderLinesCSV",
+								"type": "DatasetReference"
+							},
+							"name": "SalesOrderLines"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "WWI_output",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "select4"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          SalespersonPersonID as integer,",
+						"          PickedByPersonID as string,",
+						"          ContactPersonID as integer,",
+						"          BackorderOrderID as string,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          IsUndersupplyBackordered as integer,",
+						"          Comments as string,",
+						"          DeliveryInstructions as string,",
+						"          InternalComments as string,",
+						"          PickingCompletedWhen as string,",
+						"          LastEditedBy as integer,",
+						"          LastEditedWhen as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SalesOrders",
+						"source(output(",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          BillToCustomerID as integer,",
+						"          CustomerCategoryID as integer,",
+						"          BuyingGroupID as string,",
+						"          PrimaryContactPersonID as integer,",
+						"          AlternateContactPersonID as string,",
+						"          DeliveryMethodID as integer,",
+						"          DeliveryCityID as integer,",
+						"          PostalCityID as integer,",
+						"          CreditLimit as string,",
+						"          AccountOpenedDate as date,",
+						"          StandardDiscountPercentage as double,",
+						"          IsStatementSent as integer,",
+						"          IsOnCreditHold as integer,",
+						"          PaymentDays as integer,",
+						"          PhoneNumber as string,",
+						"          FaxNumber as string,",
+						"          DeliveryRun as string,",
+						"          RunPosition as string,",
+						"          WebsiteURL as string,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer,",
+						"          DeliveryLocation as string,",
+						"          PostalAddressLine1 as string,",
+						"          PostalAddressLine2 as string,",
+						"          PostalPostalCode as integer,",
+						"          LastEditedBy as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SalesCustomers",
+						"source(output(",
+						"          OrderLineID as integer,",
+						"          OrderID as integer,",
+						"          StockItemID as integer,",
+						"          Description as string,",
+						"          PackageTypeID as integer,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          PickedQuantity as integer,",
+						"          PickingCompletedWhen as string,",
+						"          LastEditedBy as integer,",
+						"          LastEditedWhen as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SalesOrderLines",
+						"SalesOrders select(mapColumn(",
+						"          OrderID,",
+						"          CustomerID,",
+						"          SalespersonPersonID,",
+						"          PickedByPersonID,",
+						"          ContactPersonID,",
+						"          BackorderOrderID,",
+						"          OrderDate,",
+						"          ExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber,",
+						"          PickingCompletedWhen,",
+						"          LastEditedBy,",
+						"          LastEditedWhen",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"SalesCustomers select(mapColumn(",
+						"          CustomerID,",
+						"          CustomerName,",
+						"          BillToCustomerID,",
+						"          CustomerCategoryID,",
+						"          BuyingGroupID,",
+						"          PhoneNumber,",
+						"          DeliveryAddressLine1,",
+						"          DeliveryAddressLine2,",
+						"          DeliveryPostalCode,",
+						"          PostalAddressLine1,",
+						"          PostalAddressLine2,",
+						"          PostalPostalCode,",
+						"          LastEditedBy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select1, select2 join(select1@CustomerID == select2@CustomerID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          OrderID,",
+						"          CustomerID = select1@CustomerID,",
+						"          CustomerName,",
+						"          OrderDate,",
+						"          ExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber,",
+						"          PhoneNumber,",
+						"          DeliveryAddressLine1,",
+						"          DeliveryAddressLine2,",
+						"          DeliveryPostalCode",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"select3, SalesOrderLines join(select3@OrderID == SalesOrderLines@OrderID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"join2 select(mapColumn(",
+						"          OrderID = select3@OrderID,",
+						"          CustomerID,",
+						"          CustomerName,",
+						"          PhoneNumber,",
+						"          Description,",
+						"          Quantity,",
+						"          UnitPrice,",
+						"          TaxRate,",
+						"          OrderDate,",
+						"          ExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber,",
+						"          DeliveryAddressLine1,",
+						"          DeliveryAddressLine2,",
+						"          DeliveryPostalCode",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"select4 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          PersonID as string,",
+						"          FullName as string,",
+						"          PreferredName as string,",
+						"          SearchName as string,",
+						"          IsPermittedToLogon as string,",
+						"          LogonName as string,",
+						"          IsExternalLogonProvider as string,",
+						"          HashedPassword as string,",
+						"          IsSystemUser as string,",
+						"          IsEmployee as string,",
+						"          IsSalesperson as string,",
+						"          UserPreferences as string,",
+						"          PhoneNumber as string,",
+						"          FaxNumber as string,",
+						"          EmailAddress as string,",
+						"          Photo as string,",
+						"          CustomFields as string,",
+						"          OtherLanguages as string,",
+						"          LastEditedBy as string",
+						"     ),",
+						"     partitionFileNames:['WWI_order.csv'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesOrdersCSV')]",
+				"[concat(variables('factoryId'), '/datasets/SalesCustomersCSV')]",
+				"[concat(variables('factoryId'), '/datasets/SalesOrderLinesCSV')]",
+				"[concat(variables('factoryId'), '/datasets/WWI_output')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_WWI_order')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "oltp to ods",
-						"type": "Copy",
+						"name": "dataflow_WWI_order",
+						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -210,38 +1181,24 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
+							"dataflow": {
+								"referenceName": "dataflow_WWI_order",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SalesOrders": {},
+									"SalesCustomers": {},
+									"SalesOrderLines": {},
+									"sink1": {}
 								}
 							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "AzureSqlTable1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DelimitedText1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
 					}
 				],
 				"policy": {
@@ -251,8 +1208,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
-				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
+				"[concat(variables('factoryId'), '/dataflows/dataflow_WWI_order')]"
 			]
 		}
 	]
