@@ -17,6 +17,9 @@
 		"SQLDB_connectionString": {
 			"value": ""
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"value": "https://adlsstorageaccountwu.dfs.core.windows.net/"
 		}

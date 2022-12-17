@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SQLDB'"
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adlsstorageaccountwu.dfs.core.windows.net/"
@@ -65,6 +69,9 @@
 					},
 					"SQLDB_connectionString": {
 						"value": "[parameters('SQLDB_connectionString')]"
+					},
+					"AzureSqlDatabase1_connectionString": {
+						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
 					},
 					"ADLSGen2_properties_typeProperties_url": {
 						"value": "[parameters('ADLSGen2_properties_typeProperties_url')]"
