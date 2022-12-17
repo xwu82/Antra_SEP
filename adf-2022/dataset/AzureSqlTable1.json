@@ -1,0 +1,97 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Order_Key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "OrderID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CustomerID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SalespersonPersonID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PickedByPersonID",
+				"type": "varchar"
+			},
+			{
+				"name": "ContactPersonID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BackorderOrderID",
+				"type": "varchar"
+			},
+			{
+				"name": "OrderDate",
+				"type": "date"
+			},
+			{
+				"name": "ExpectedDeliveryDate",
+				"type": "date"
+			},
+			{
+				"name": "CustomerPurchaseOrderNumber",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "IsUndersupplyBackordered",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Comments",
+				"type": "varchar"
+			},
+			{
+				"name": "DeliveryInstructions",
+				"type": "varchar"
+			},
+			{
+				"name": "InternalComments",
+				"type": "varchar"
+			},
+			{
+				"name": "PickingCompletedWhen",
+				"type": "varchar"
+			},
+			{
+				"name": "LastEditedBy",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "LastEditedWhen",
+				"type": "varchar"
+			},
+			{
+				"name": "Is_active",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Dim_order"
+		}
+	}
+}

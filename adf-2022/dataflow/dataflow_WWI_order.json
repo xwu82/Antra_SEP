@@ -24,6 +24,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "SalesOrderLines"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "DIMorder"
 				}
 			],
 			"sinks": [
@@ -32,7 +39,7 @@
 						"referenceName": "WWI_output",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "STGorder"
 				}
 			],
 			"transformations": [
@@ -131,6 +138,30 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SalesOrderLines",
+				"source(output(",
+				"          Order_Key as integer,",
+				"          OrderID as integer,",
+				"          CustomerID as integer,",
+				"          SalespersonPersonID as integer,",
+				"          PickedByPersonID as string,",
+				"          ContactPersonID as integer,",
+				"          BackorderOrderID as string,",
+				"          OrderDate as date,",
+				"          ExpectedDeliveryDate as date,",
+				"          CustomerPurchaseOrderNumber as integer,",
+				"          IsUndersupplyBackordered as integer,",
+				"          Comments as string,",
+				"          DeliveryInstructions as string,",
+				"          InternalComments as string,",
+				"          PickingCompletedWhen as string,",
+				"          LastEditedBy as integer,",
+				"          LastEditedWhen as string,",
+				"          Is_active as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> DIMorder",
 				"SalesOrders select(mapColumn(",
 				"          OrderID,",
 				"          CustomerID,",
@@ -232,7 +263,7 @@
 				"     partitionFileNames:['WWI_order.csv'],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> sink1"
+				"     partitionBy('hash', 1)) ~> STGorder"
 			]
 		}
 	}
