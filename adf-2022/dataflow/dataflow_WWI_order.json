@@ -27,7 +27,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable1",
+						"referenceName": "DIMorder",
 						"type": "DatasetReference"
 					},
 					"name": "DIMorder"
@@ -39,7 +39,14 @@
 						"referenceName": "WWI_output",
 						"type": "DatasetReference"
 					},
-					"name": "STGorder"
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DIMorder",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
 				}
 			],
 			"transformations": [
@@ -59,7 +66,10 @@
 					"name": "join2"
 				},
 				{
-					"name": "select4"
+					"name": "STGorder"
+				},
+				{
+					"name": "exists1"
 				}
 			],
 			"scriptLines": [
@@ -139,24 +149,22 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SalesOrderLines",
 				"source(output(",
-				"          Order_Key as integer,",
+				"          order_key as integer,",
 				"          OrderID as integer,",
 				"          CustomerID as integer,",
-				"          SalespersonPersonID as integer,",
-				"          PickedByPersonID as string,",
-				"          ContactPersonID as integer,",
-				"          BackorderOrderID as string,",
+				"          CustomerName as string,",
+				"          PhoneNumber as string,",
+				"          Description as string,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TaxRate as double,",
 				"          OrderDate as date,",
 				"          ExpectedDeliveryDate as date,",
 				"          CustomerPurchaseOrderNumber as integer,",
-				"          IsUndersupplyBackordered as integer,",
-				"          Comments as string,",
-				"          DeliveryInstructions as string,",
-				"          InternalComments as string,",
-				"          PickingCompletedWhen as string,",
-				"          LastEditedBy as integer,",
-				"          LastEditedWhen as string,",
-				"          Is_active as string",
+				"          DeliveryAddressLine1 as string,",
+				"          DeliveryAddressLine2 as string,",
+				"          DeliveryPostalCode as integer,",
+				"          Is_valid as integer",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
@@ -236,8 +244,11 @@
 				"          DeliveryPostalCode",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select4",
-				"select4 sink(allowSchemaDrift: true,",
+				"     skipDuplicateMapOutputs: true) ~> STGorder",
+				"STGorder, DIMorder exists(STGorder@OrderID == DIMorder@OrderID,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"STGorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          PersonID as string,",
@@ -263,7 +274,51 @@
 				"     partitionFileNames:['WWI_order.csv'],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> STGorder"
+				"     partitionBy('hash', 1)) ~> sink1",
+				"exists1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          order_key as integer,",
+				"          OrderID as integer,",
+				"          CustomerID as integer,",
+				"          CustomerName as string,",
+				"          PhoneNumber as string,",
+				"          Description as string,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TaxRate as double,",
+				"          OrderDate as date,",
+				"          ExpectedDeliveryDate as date,",
+				"          CustomerPurchaseOrderNumber as integer,",
+				"          DeliveryAddressLine1 as string,",
+				"          DeliveryAddressLine2 as string,",
+				"          DeliveryPostalCode as integer,",
+				"          Is_valid as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          OrderID,",
+				"          CustomerID,",
+				"          CustomerName,",
+				"          PhoneNumber,",
+				"          Description,",
+				"          Quantity,",
+				"          UnitPrice,",
+				"          TaxRate,",
+				"          OrderDate,",
+				"          ExpectedDeliveryDate,",
+				"          CustomerPurchaseOrderNumber,",
+				"          DeliveryAddressLine1,",
+				"          DeliveryAddressLine2,",
+				"          DeliveryPostalCode",
+				"     )) ~> sink2"
 			]
 		}
 	}
