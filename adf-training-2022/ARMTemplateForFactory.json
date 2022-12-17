@@ -37,6 +37,59 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow_WWI_order",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow_WWI_order",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SalesOrders": {},
+									"SalesCustomers": {},
+									"SalesOrderLines": {},
+									"DIMorder": {},
+									"sink1": {},
+									"sink2": {},
+									"sink3": {},
+									"sink4": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow_WWI_order')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pipeline_WWI_order')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -65,7 +118,9 @@
 									"SalesOrderLines": {},
 									"DIMorder": {},
 									"sink1": {},
-									"sink2": {}
+									"sink2": {},
+									"sink3": {},
+									"sink4": {}
 								}
 							},
 							"staging": {},
@@ -269,11 +324,6 @@
 						"name": "DeliveryPostalCode",
 						"type": "int",
 						"precision": 10
-					},
-					{
-						"name": "Is_valid",
-						"type": "int",
-						"precision": 10
 					}
 				],
 				"typeProperties": {
@@ -283,45 +333,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/GenericDataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Folder": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "SCD"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": {
-							"value": "@dataset().Folder",
-							"type": "Expression"
-						},
-						"container": "demo"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
@@ -1168,6 +1179,20 @@
 								"type": "DatasetReference"
 							},
 							"name": "sink2"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "sink3"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "sink4"
 						}
 					],
 					"transformations": [
@@ -1190,7 +1215,16 @@
 							"name": "STGorder"
 						},
 						{
-							"name": "exists1"
+							"name": "select4"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "derivedColumn1"
 						}
 					],
 					"scriptLines": [
@@ -1284,8 +1318,7 @@
 						"          CustomerPurchaseOrderNumber as integer,",
 						"          DeliveryAddressLine1 as string,",
 						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Is_valid as integer",
+						"          DeliveryPostalCode as integer",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -1366,9 +1399,32 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> STGorder",
-						"STGorder, DIMorder exists(STGorder@OrderID == DIMorder@OrderID,",
-						"     negate:true,",
-						"     broadcast: 'auto')~> exists1",
+						"DIMorder select(mapColumn(",
+						"          Dimorder_key = order_key,",
+						"          DimOrderID = OrderID,",
+						"          DimCustomerID = CustomerID,",
+						"          DimCustomerName = CustomerName,",
+						"          DimPhoneNumber = PhoneNumber,",
+						"          DimDescription = Description,",
+						"          DimQuantity = Quantity,",
+						"          DimUnitPrice = UnitPrice,",
+						"          DimTaxRate = TaxRate,",
+						"          DimOrderDate = OrderDate,",
+						"          DimExpectedDeliveryDate = ExpectedDeliveryDate,",
+						"          DimCustomerPurchaseOrderNumber = CustomerPurchaseOrderNumber,",
+						"          DimDeliveryAddressLine1 = DeliveryAddressLine1,",
+						"          DimDeliveryAddressLine2 = DeliveryAddressLine2,",
+						"          DimDeliveryPostalCode = DeliveryPostalCode",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"STGorder, select4 lookup(CustomerID == DimOrderID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"lookup1 split(isNull(DimOrderID),",
+						"     disjoint: false) ~> split1@(New, Exist)",
+						"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
 						"STGorder sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1396,7 +1452,7 @@
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     partitionBy('hash', 1)) ~> sink1",
-						"exists1 sink(allowSchemaDrift: true,",
+						"DIMorder sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          order_key as integer,",
@@ -1413,8 +1469,78 @@
 						"          CustomerPurchaseOrderNumber as integer,",
 						"          DeliveryAddressLine1 as string,",
 						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Is_valid as integer",
+						"          DeliveryPostalCode as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          order_key,",
+						"          OrderID,",
+						"          CustomerID,",
+						"          CustomerName,",
+						"          PhoneNumber,",
+						"          Description,",
+						"          Quantity,",
+						"          UnitPrice,",
+						"          TaxRate,",
+						"          OrderDate,",
+						"          ExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber,",
+						"          DeliveryAddressLine1,",
+						"          DeliveryAddressLine2,",
+						"          DeliveryPostalCode",
+						"     )) ~> sink2",
+						"DIMorder sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink3",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -1439,7 +1565,7 @@
 						"          DeliveryAddressLine1,",
 						"          DeliveryAddressLine2,",
 						"          DeliveryPostalCode",
-						"     )) ~> sink2"
+						"     )) ~> sink4"
 					]
 				}
 			},
