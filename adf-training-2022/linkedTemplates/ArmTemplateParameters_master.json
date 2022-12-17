@@ -11,13 +11,13 @@
 		"AzureBlobStorage1_connectionString": {
 			"value": ""
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
 		"OutputDatabase_connectionString": {
 			"value": ""
 		},
 		"SQLDB_connectionString": {
-			"value": ""
-		},
-		"AzureSqlDatabase1_connectionString": {
 			"value": ""
 		},
 		"ADLSGen2_properties_typeProperties_url": {

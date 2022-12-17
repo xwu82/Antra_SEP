@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
 		"OutputDatabase_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'OutputDatabase'"
@@ -22,10 +26,6 @@
 		"SQLDB_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SQLDB'"
-		},
-		"AzureSqlDatabase1_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
 		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
@@ -63,7 +63,9 @@
 									"SalesOrders": {},
 									"SalesCustomers": {},
 									"SalesOrderLines": {},
-									"sink1": {}
+									"DIMorder": {},
+									"sink1": {},
+									"sink2": {}
 								}
 							},
 							"staging": {},
@@ -186,6 +188,140 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DIMorder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "order_key",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerName",
+						"type": "varchar"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "Description",
+						"type": "varchar"
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "TaxRate",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "OrderDate",
+						"type": "date"
+					},
+					{
+						"name": "ExpectedDeliveryDate",
+						"type": "date"
+					},
+					{
+						"name": "CustomerPurchaseOrderNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DeliveryAddressLine1",
+						"type": "varchar"
+					},
+					{
+						"name": "DeliveryAddressLine2",
+						"type": "varchar"
+					},
+					{
+						"name": "DeliveryPostalCode",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Is_valid",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dim_order"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GenericDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Folder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "SCD"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": {
+							"value": "@dataset().Folder",
+							"type": "Expression"
+						},
+						"container": "demo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
@@ -943,6 +1079,19 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/OutputDatabase')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -996,6 +1145,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "SalesOrderLines"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "DIMorder"
 						}
 					],
 					"sinks": [
@@ -1005,6 +1161,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
 						}
 					],
 					"transformations": [
@@ -1024,7 +1187,10 @@
 							"name": "join2"
 						},
 						{
-							"name": "select4"
+							"name": "STGorder"
+						},
+						{
+							"name": "exists1"
 						}
 					],
 					"scriptLines": [
@@ -1103,6 +1269,28 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> SalesOrderLines",
+						"source(output(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer,",
+						"          Is_valid as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> DIMorder",
 						"SalesOrders select(mapColumn(",
 						"          OrderID,",
 						"          CustomerID,",
@@ -1177,8 +1365,11 @@
 						"          DeliveryPostalCode",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select4",
-						"select4 sink(allowSchemaDrift: true,",
+						"     skipDuplicateMapOutputs: true) ~> STGorder",
+						"STGorder, DIMorder exists(STGorder@OrderID == DIMorder@OrderID,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> exists1",
+						"STGorder sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          PersonID as string,",
@@ -1204,7 +1395,51 @@
 						"     partitionFileNames:['WWI_order.csv'],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
+						"     partitionBy('hash', 1)) ~> sink1",
+						"exists1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer,",
+						"          Is_valid as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          OrderID,",
+						"          CustomerID,",
+						"          CustomerName,",
+						"          PhoneNumber,",
+						"          Description,",
+						"          Quantity,",
+						"          UnitPrice,",
+						"          TaxRate,",
+						"          OrderDate,",
+						"          ExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber,",
+						"          DeliveryAddressLine1,",
+						"          DeliveryAddressLine2,",
+						"          DeliveryPostalCode",
+						"     )) ~> sink2"
 					]
 				}
 			},
@@ -1212,59 +1447,8 @@
 				"[concat(variables('factoryId'), '/datasets/SalesOrdersCSV')]",
 				"[concat(variables('factoryId'), '/datasets/SalesCustomersCSV')]",
 				"[concat(variables('factoryId'), '/datasets/SalesOrderLinesCSV')]",
+				"[concat(variables('factoryId'), '/datasets/DIMorder')]",
 				"[concat(variables('factoryId'), '/datasets/WWI_output')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/GenericDataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"Folder": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "SCD"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": {
-							"value": "@dataset().Folder",
-							"type": "Expression"
-						},
-						"container": "demo"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		}
 	]
