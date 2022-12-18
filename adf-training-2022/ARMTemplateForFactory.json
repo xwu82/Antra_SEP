@@ -64,7 +64,10 @@
 									"SalesCustomers": {},
 									"SalesOrderLines": {},
 									"DIMorder": {},
-									"sink4": {}
+									"MaxKey": {},
+									"sink4": {},
+									"sink5": {},
+									"sink6": {}
 								}
 							},
 							"staging": {},
@@ -187,6 +190,101 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DIMorder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "order_key",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerName",
+						"type": "varchar"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "Description",
+						"type": "varchar"
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "TaxRate",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "OrderDate",
+						"type": "date"
+					},
+					{
+						"name": "ExpectedDeliveryDate",
+						"type": "date"
+					},
+					{
+						"name": "CustomerPurchaseOrderNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DeliveryAddressLine1",
+						"type": "varchar"
+					},
+					{
+						"name": "DeliveryAddressLine2",
+						"type": "varchar"
+					},
+					{
+						"name": "DeliveryPostalCode",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Isactive",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dim_order"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
@@ -1017,6 +1115,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "DIMorder"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "MaxKey"
 						}
 					],
 					"sinks": [
@@ -1026,6 +1131,20 @@
 								"type": "DatasetReference"
 							},
 							"name": "sink4"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "sink5"
+						},
+						{
+							"dataset": {
+								"referenceName": "DIMorder",
+								"type": "DatasetReference"
+							},
+							"name": "sink6"
 						}
 					],
 					"transformations": [
@@ -1058,6 +1177,18 @@
 						},
 						{
 							"name": "select4"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "alterRow1"
 						}
 					],
 					"scriptLines": [
@@ -1158,6 +1289,29 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> DIMorder",
+						"source(output(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer,",
+						"          Isactive as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'select max([OrderId]) as MaxKey\\n  from [dbo].[dim_order]',",
+						"     format: 'query') ~> MaxKey",
 						"SalesOrders select(mapColumn(",
 						"          OrderID,",
 						"          CustomerID,",
@@ -1260,6 +1414,10 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select4",
+						"split1@Exist derive(isactiveinsert = 1) ~> derivedColumn2",
+						"split1@Exist derive(isactiveUpdate = 0) ~> derivedColumn3",
+						"derivedColumn3 filter((OrderID == DimOrderID) && (CustomerID != DimCustomerID || CustomerName !=DimCustomerName)) ~> filter1",
+						"filter1 alterRow(updateIf((OrderID==DimOrderID)&&(CustomerID!=DimCustomerID||CustomerName!=DimCustomerName))) ~> alterRow1",
 						"derivedColumn1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1304,7 +1462,101 @@
 						"          DeliveryAddressLine2,",
 						"          DeliveryPostalCode,",
 						"          Isactive = isactiveinsert",
-						"     )) ~> sink4"
+						"     )) ~> sink4",
+						"derivedColumn2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer,",
+						"          Isactive as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          OrderID,",
+						"          CustomerID,",
+						"          CustomerName,",
+						"          PhoneNumber,",
+						"          Description,",
+						"          Quantity,",
+						"          UnitPrice,",
+						"          TaxRate,",
+						"          OrderDate,",
+						"          ExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber,",
+						"          DeliveryAddressLine1,",
+						"          DeliveryAddressLine2,",
+						"          DeliveryPostalCode,",
+						"          Isactive = isactiveinsert",
+						"     )) ~> sink5",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          order_key as integer,",
+						"          OrderID as integer,",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          PhoneNumber as string,",
+						"          Description as string,",
+						"          Quantity as integer,",
+						"          UnitPrice as double,",
+						"          TaxRate as double,",
+						"          OrderDate as date,",
+						"          ExpectedDeliveryDate as date,",
+						"          CustomerPurchaseOrderNumber as integer,",
+						"          DeliveryAddressLine1 as string,",
+						"          DeliveryAddressLine2 as string,",
+						"          DeliveryPostalCode as integer,",
+						"          Isactive as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['order_key'],",
+						"     format: 'table',",
+						"     preSQLs:['set IDENTITY_insert Dimorder_key on;'],",
+						"     postSQLs:['set IDENTITY_insert Dimorder_key off;'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          OrderID = DimOrderID,",
+						"          CustomerID = DimCustomerID,",
+						"          CustomerName = DimCustomerName,",
+						"          PhoneNumber = DimPhoneNumber,",
+						"          Description = DimDescription,",
+						"          Quantity = DimQuantity,",
+						"          UnitPrice = DimUnitPrice,",
+						"          TaxRate = DimTaxRate,",
+						"          OrderDate = DimOrderDate,",
+						"          ExpectedDeliveryDate = DimExpectedDeliveryDate,",
+						"          CustomerPurchaseOrderNumber = DimCustomerPurchaseOrderNumber,",
+						"          DeliveryAddressLine1 = DimDeliveryAddressLine1,",
+						"          DeliveryAddressLine2 = DimDeliveryAddressLine2,",
+						"          DeliveryPostalCode = DimDeliveryPostalCode,",
+						"          Isactive = DimIsactive,",
+						"          order_key = Dimorder_key",
+						"     )) ~> sink6"
 					]
 				}
 			},
@@ -1313,101 +1565,6 @@
 				"[concat(variables('factoryId'), '/datasets/SalesCustomersCSV')]",
 				"[concat(variables('factoryId'), '/datasets/SalesOrderLinesCSV')]",
 				"[concat(variables('factoryId'), '/datasets/DIMorder')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DIMorder')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "order_key",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "OrderID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CustomerID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CustomerName",
-						"type": "varchar"
-					},
-					{
-						"name": "PhoneNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "Description",
-						"type": "varchar"
-					},
-					{
-						"name": "Quantity",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "UnitPrice",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "TaxRate",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "OrderDate",
-						"type": "date"
-					},
-					{
-						"name": "ExpectedDeliveryDate",
-						"type": "date"
-					},
-					{
-						"name": "CustomerPurchaseOrderNumber",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DeliveryAddressLine1",
-						"type": "varchar"
-					},
-					{
-						"name": "DeliveryAddressLine2",
-						"type": "varchar"
-					},
-					{
-						"name": "DeliveryPostalCode",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Isactive",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "dim_order"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		}
 	]
