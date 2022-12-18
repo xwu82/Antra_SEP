@@ -209,96 +209,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DIMorder')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "order_key",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "OrderID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CustomerID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CustomerName",
-						"type": "varchar"
-					},
-					{
-						"name": "PhoneNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "Description",
-						"type": "varchar"
-					},
-					{
-						"name": "Quantity",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "UnitPrice",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "TaxRate",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "OrderDate",
-						"type": "date"
-					},
-					{
-						"name": "ExpectedDeliveryDate",
-						"type": "date"
-					},
-					{
-						"name": "CustomerPurchaseOrderNumber",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DeliveryAddressLine1",
-						"type": "varchar"
-					},
-					{
-						"name": "DeliveryAddressLine2",
-						"type": "varchar"
-					},
-					{
-						"name": "DeliveryPostalCode",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "dim_order"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/SalesCustomersCSV')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1023,6 +933,101 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DIMorder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "order_key",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerName",
+						"type": "varchar"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "Description",
+						"type": "varchar"
+					},
+					{
+						"name": "Quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "TaxRate",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "OrderDate",
+						"type": "date"
+					},
+					{
+						"name": "ExpectedDeliveryDate",
+						"type": "date"
+					},
+					{
+						"name": "CustomerPurchaseOrderNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DeliveryAddressLine1",
+						"type": "varchar"
+					},
+					{
+						"name": "DeliveryAddressLine2",
+						"type": "varchar"
+					},
+					{
+						"name": "DeliveryPostalCode",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Isactive",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dim_order"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dataflow_WWI_order')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -1062,13 +1067,6 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "WWI_output",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						},
-						{
-							"dataset": {
 								"referenceName": "DIMorder",
 								"type": "DatasetReference"
 							},
@@ -1095,9 +1093,6 @@
 							"name": "STGorder"
 						},
 						{
-							"name": "select4"
-						},
-						{
 							"name": "lookup1"
 						},
 						{
@@ -1105,6 +1100,9 @@
 						},
 						{
 							"name": "derivedColumn1"
+						},
+						{
+							"name": "select4"
 						}
 					],
 					"scriptLines": [
@@ -1198,7 +1196,8 @@
 						"          CustomerPurchaseOrderNumber as integer,",
 						"          DeliveryAddressLine1 as string,",
 						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer",
+						"          DeliveryPostalCode as integer,",
+						"          Isactive as integer",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -1279,6 +1278,13 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> STGorder",
+						"STGorder, select4 lookup(CustomerID == DimCustomerID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"lookup1 split(isNull(DimOrderID),",
+						"     disjoint: false) ~> split1@(New, Exist)",
+						"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
 						"DIMorder select(mapColumn(",
 						"          Dimorder_key = order_key,",
 						"          DimOrderID = OrderID,",
@@ -1294,44 +1300,11 @@
 						"          DimCustomerPurchaseOrderNumber = CustomerPurchaseOrderNumber,",
 						"          DimDeliveryAddressLine1 = DeliveryAddressLine1,",
 						"          DimDeliveryAddressLine2 = DeliveryAddressLine2,",
-						"          DimDeliveryPostalCode = DeliveryPostalCode",
+						"          DimDeliveryPostalCode = DeliveryPostalCode,",
+						"          DimIsactive = Isactive",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select4",
-						"STGorder, select4 lookup(CustomerID == DimOrderID,",
-						"     multiple: false,",
-						"     pickup: 'any',",
-						"     broadcast: 'auto')~> lookup1",
-						"lookup1 split(isNull(DimOrderID),",
-						"     disjoint: false) ~> split1@(New, Exist)",
-						"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
-						"STGorder sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          PersonID as string,",
-						"          FullName as string,",
-						"          PreferredName as string,",
-						"          SearchName as string,",
-						"          IsPermittedToLogon as string,",
-						"          LogonName as string,",
-						"          IsExternalLogonProvider as string,",
-						"          HashedPassword as string,",
-						"          IsSystemUser as string,",
-						"          IsEmployee as string,",
-						"          IsSalesperson as string,",
-						"          UserPreferences as string,",
-						"          PhoneNumber as string,",
-						"          FaxNumber as string,",
-						"          EmailAddress as string,",
-						"          Photo as string,",
-						"          CustomFields as string,",
-						"          OtherLanguages as string,",
-						"          LastEditedBy as string",
-						"     ),",
-						"     partitionFileNames:['WWI_order.csv'],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1",
 						"derivedColumn1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1349,7 +1322,8 @@
 						"          CustomerPurchaseOrderNumber as integer,",
 						"          DeliveryAddressLine1 as string,",
 						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer",
+						"          DeliveryPostalCode as integer,",
+						"          Isactive as integer",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -1373,7 +1347,8 @@
 						"          CustomerPurchaseOrderNumber,",
 						"          DeliveryAddressLine1,",
 						"          DeliveryAddressLine2,",
-						"          DeliveryPostalCode",
+						"          DeliveryPostalCode,",
+						"          Isactive = isactiveinsert",
 						"     )) ~> sink4"
 					]
 				}
@@ -1382,8 +1357,7 @@
 				"[concat(variables('factoryId'), '/datasets/SalesOrdersCSV')]",
 				"[concat(variables('factoryId'), '/datasets/SalesCustomersCSV')]",
 				"[concat(variables('factoryId'), '/datasets/SalesOrderLinesCSV')]",
-				"[concat(variables('factoryId'), '/datasets/DIMorder')]",
-				"[concat(variables('factoryId'), '/datasets/WWI_output')]"
+				"[concat(variables('factoryId'), '/datasets/DIMorder')]"
 			]
 		},
 		{
@@ -1414,7 +1388,6 @@
 									"SalesCustomers": {},
 									"SalesOrderLines": {},
 									"DIMorder": {},
-									"sink1": {},
 									"sink4": {}
 								}
 							},
