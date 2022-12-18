@@ -448,7 +448,7 @@
 				"     insertable:false,",
 				"     updateable:true,",
 				"     upsertable:false,",
-				"     keys:['Dimorder_key'],",
+				"     keys:['order_key'],",
 				"     format: 'table',",
 				"     preSQLs:['set IDENTITY_insert Dimorder_key on;'],",
 				"     postSQLs:['set IDENTITY_insert Dimorder_key off;'],",
@@ -470,7 +470,8 @@
 				"          DeliveryAddressLine1 = DimDeliveryAddressLine1,",
 				"          DeliveryAddressLine2 = DimDeliveryAddressLine2,",
 				"          DeliveryPostalCode = DimDeliveryPostalCode,",
-				"          Isactive = DimIsactive",
+				"          Isactive = DimIsactive,",
+				"          order_key = Dimorder_key",
 				"     )) ~> sink6"
 			]
 		}
