@@ -30,15 +30,11 @@
 						"referenceName": "DIMorder",
 						"type": "DatasetReference"
 					},
-					"name": "DIMorder"
+					"name": "source1"
 				}
 			],
 			"sinks": [
 				{
-					"dataset": {
-						"referenceName": "DIMorder",
-						"type": "DatasetReference"
-					},
 					"name": "sink4"
 				}
 			],
@@ -62,9 +58,6 @@
 					"name": "STGorder"
 				},
 				{
-					"name": "select4"
-				},
-				{
 					"name": "lookup1"
 				},
 				{
@@ -72,6 +65,9 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "select4"
 				}
 			],
 			"scriptLines": [
@@ -165,12 +161,13 @@
 				"          CustomerPurchaseOrderNumber as integer,",
 				"          DeliveryAddressLine1 as string,",
 				"          DeliveryAddressLine2 as string,",
-				"          DeliveryPostalCode as integer",
+				"          DeliveryPostalCode as integer,",
+				"          Isactive as integer",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> DIMorder",
+				"     format: 'table') ~> source1",
 				"SalesOrders select(mapColumn(",
 				"          OrderID,",
 				"          CustomerID,",
@@ -246,7 +243,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> STGorder",
-				"DIMorder select(mapColumn(",
+				"STGorder, source1 lookup(STGorder@CustomerID == DimOrderID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 split(isNull(DimOrderID),",
+				"     disjoint: false) ~> split1@(New, Exist)",
+				"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
+				"source1 select(mapColumn(",
 				"          Dimorder_key = order_key,",
 				"          DimOrderID = OrderID,",
 				"          DimCustomerID = CustomerID,",
@@ -261,44 +265,15 @@
 				"          DimCustomerPurchaseOrderNumber = CustomerPurchaseOrderNumber,",
 				"          DimDeliveryAddressLine1 = DeliveryAddressLine1,",
 				"          DimDeliveryAddressLine2 = DeliveryAddressLine2,",
-				"          DimDeliveryPostalCode = DeliveryPostalCode",
+				"          DimDeliveryPostalCode = DeliveryPostalCode,",
+				"          DimIsactive = Isactive",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select4",
-				"STGorder, select4 lookup(CustomerID == DimOrderID,",
-				"     multiple: false,",
-				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookup1",
-				"lookup1 split(isNull(DimOrderID),",
-				"     disjoint: false) ~> split1@(New, Exist)",
-				"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     input(",
-				"          order_key as integer,",
-				"          OrderID as integer,",
-				"          CustomerID as integer,",
-				"          CustomerName as string,",
-				"          PhoneNumber as string,",
-				"          Description as string,",
-				"          Quantity as integer,",
-				"          UnitPrice as double,",
-				"          TaxRate as double,",
-				"          OrderDate as date,",
-				"          ExpectedDeliveryDate as date,",
-				"          CustomerPurchaseOrderNumber as integer,",
-				"          DeliveryAddressLine1 as string,",
-				"          DeliveryAddressLine2 as string,",
-				"          DeliveryPostalCode as integer",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          OrderID,",
 				"          CustomerID,",
@@ -314,7 +289,8 @@
 				"          DeliveryAddressLine1,",
 				"          DeliveryAddressLine2,",
 				"          DeliveryPostalCode",
-				"     )) ~> sink4"
+				"     ),",
+				"     format: 'table') ~> sink4"
 			]
 		}
 	}
