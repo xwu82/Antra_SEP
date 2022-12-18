@@ -30,11 +30,15 @@
 						"referenceName": "DIMorder",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "DIMorder"
 				}
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "DIMorder",
+						"type": "DatasetReference"
+					},
 					"name": "sink4"
 				}
 			],
@@ -167,7 +171,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source1",
+				"     format: 'table') ~> DIMorder",
 				"SalesOrders select(mapColumn(",
 				"          OrderID,",
 				"          CustomerID,",
@@ -243,14 +247,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> STGorder",
-				"STGorder, source1 lookup(STGorder@CustomerID == DimOrderID,",
+				"STGorder, select4 lookup(CustomerID == DimCustomerID,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup1",
 				"lookup1 split(isNull(DimOrderID),",
 				"     disjoint: false) ~> split1@(New, Exist)",
 				"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
-				"source1 select(mapColumn(",
+				"DIMorder select(mapColumn(",
 				"          Dimorder_key = order_key,",
 				"          DimOrderID = OrderID,",
 				"          DimCustomerID = CustomerID,",
@@ -272,8 +276,32 @@
 				"     skipDuplicateMapOutputs: true) ~> select4",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          order_key as integer,",
+				"          OrderID as integer,",
+				"          CustomerID as integer,",
+				"          CustomerName as string,",
+				"          PhoneNumber as string,",
+				"          Description as string,",
+				"          Quantity as integer,",
+				"          UnitPrice as double,",
+				"          TaxRate as double,",
+				"          OrderDate as date,",
+				"          ExpectedDeliveryDate as date,",
+				"          CustomerPurchaseOrderNumber as integer,",
+				"          DeliveryAddressLine1 as string,",
+				"          DeliveryAddressLine2 as string,",
+				"          DeliveryPostalCode as integer,",
+				"          Isactive as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          OrderID,",
 				"          CustomerID,",
@@ -288,9 +316,9 @@
 				"          CustomerPurchaseOrderNumber,",
 				"          DeliveryAddressLine1,",
 				"          DeliveryAddressLine2,",
-				"          DeliveryPostalCode",
-				"     ),",
-				"     format: 'table') ~> sink4"
+				"          DeliveryPostalCode,",
+				"          Isactive = isactiveinsert",
+				"     )) ~> sink4"
 			]
 		}
 	}
