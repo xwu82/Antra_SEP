@@ -82,7 +82,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select MAX(LastEditedWhen) as NewWatermarkvalue FROM Sales.Orders ",
+								"sqlReaderQuery": "select MAX(LastEditedWhen) as NewWatermarkvalue FROM [dbo].[Sales.Orders]",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -122,7 +122,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "select * from Sales.Orders where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
+									"value": "select * from [dbo].[Sales.Orders] where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
