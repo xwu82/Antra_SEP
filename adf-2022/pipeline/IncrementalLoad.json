@@ -41,7 +41,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select MAX(LastEditedWhen) as NewWatermarkvalue FROM Sales.Orders ",
+						"sqlReaderQuery": "select MAX(LastEditedWhen) as NewWatermarkvalue FROM [dbo].[Sales.Orders]",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -79,7 +79,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select * from Sales.Orders where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
+						"sqlReaderQuery": {
+							"value": "select * from Sales.Orders where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -140,11 +143,17 @@
 					"storedProcedureName": "[dbo].[sp_write_watermark]",
 					"storedProcedureParameters": {
 						"LastModifiedtime": {
-							"value": "@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}",
+							"value": {
+								"value": "@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}",
+								"type": "Expression"
+							},
 							"type": "DateTime"
 						},
 						"TableName": {
-							"value": "@{activity('LookupOldWaterMarkActivity').output.firstRow.TableName}",
+							"value": {
+								"value": "@{activity('LookupOldWaterMarkActivity').output.firstRow.TableName}",
+								"type": "Expression"
+							},
 							"type": "String"
 						}
 					}
