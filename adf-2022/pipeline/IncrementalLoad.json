@@ -80,7 +80,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select * from Sales.Orders where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
+							"value": "select * from [dbo].[Sales.Orders] where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
