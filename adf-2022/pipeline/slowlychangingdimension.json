@@ -17,7 +17,12 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "dataflow_WWI_order",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"SalesOrders": {
+								"SalesOrders": "Sales.Orders"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
