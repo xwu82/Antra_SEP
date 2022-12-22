@@ -209,38 +209,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TableName",
-						"type": "varchar"
-					},
-					{
-						"name": "WatermarkValue",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "watermarktable"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DIMorder')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -344,11 +312,20 @@
 					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"OrderIncrementalLoad": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().OrderIncrementalLoad",
+							"type": "Expression"
+						},
 						"container": "adf-container1"
 					},
 					"columnDelimiter": ",",
@@ -795,6 +772,11 @@
 					"referenceName": "SQLDB",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"SalesOrders": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [
@@ -872,7 +854,10 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "Sales.Orders"
+					"table": {
+						"value": "@dataset().SalesOrders",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
@@ -1144,6 +1129,46 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/WatermarktableOrder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"WatermarkOrder": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TableName",
+						"type": "varchar"
+					},
+					{
+						"name": "WatermarkValue",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().WatermarkOrder",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/IncrementalLoad')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1169,9 +1194,11 @@
 								"partitionOption": "None"
 							},
 							"dataset": {
-								"referenceName": "AzureSqlTable1",
+								"referenceName": "WatermarktableOrder",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"WatermarkOrder": "watermarktable"
+								}
 							}
 						}
 					},
@@ -1197,7 +1224,9 @@
 							"dataset": {
 								"referenceName": "SalesOrdersCSV",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"SalesOrders": "Sales.Orders"
+								}
 							}
 						}
 					},
@@ -1261,14 +1290,21 @@
 							{
 								"referenceName": "SalesOrdersCSV",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"SalesOrders": "Sales.Orders"
+								}
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "OrderIncrementalLoad",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"OrderIncrementalLoad": {
+										"value": "@concat('OrderIncrementalLoad-',utcnow(),'.csv')",
+										"type": "Expression"
+									}
+								}
 							}
 						]
 					},
@@ -1323,7 +1359,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
+				"[concat(variables('factoryId'), '/datasets/WatermarktableOrder')]",
 				"[concat(variables('factoryId'), '/datasets/SalesOrdersCSV')]",
 				"[concat(variables('factoryId'), '/datasets/OrderIncrementalLoad')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
@@ -1840,7 +1876,9 @@
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"SalesOrders": {},
+									"SalesOrders": {
+										"SalesOrders": "Sales.Orders"
+									},
 									"SalesCustomers": {},
 									"SalesOrderLines": {},
 									"DIMorder": {},
