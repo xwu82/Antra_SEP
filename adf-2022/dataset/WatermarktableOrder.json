@@ -1,9 +1,14 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "WatermarktableOrder",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureSqlDatabase1",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"WatermarkOrder": {
+				"type": "string"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
@@ -21,7 +26,10 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "watermarktable"
+			"table": {
+				"value": "@dataset().WatermarkOrder",
+				"type": "Expression"
+			}
 		}
 	}
 }

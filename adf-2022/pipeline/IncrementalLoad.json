@@ -22,8 +22,11 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "AzureSqlTable1",
-						"type": "DatasetReference"
+						"referenceName": "WatermarktableOrder",
+						"type": "DatasetReference",
+						"parameters": {
+							"WatermarkOrder": "watermarktable"
+						}
 					}
 				}
 			},
@@ -48,7 +51,10 @@
 					},
 					"dataset": {
 						"referenceName": "SalesOrdersCSV",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"SalesOrders": "Sales.Orders"
+						}
 					}
 				}
 			},
@@ -111,13 +117,22 @@
 				"inputs": [
 					{
 						"referenceName": "SalesOrdersCSV",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"SalesOrders": "Sales.Orders"
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "OrderIncrementalLoad",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"OrderIncrementalLoad": {
+								"value": "@concat('OrderIncrementalLoad-',utcnow(),'.csv')",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			},

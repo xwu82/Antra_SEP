@@ -5,11 +5,20 @@
 			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"OrderIncrementalLoad": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().OrderIncrementalLoad",
+					"type": "Expression"
+				},
 				"container": "adf-container1"
 			},
 			"columnDelimiter": ",",

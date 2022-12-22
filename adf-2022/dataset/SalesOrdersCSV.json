@@ -5,6 +5,11 @@
 			"referenceName": "SQLDB",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"SalesOrders": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
@@ -82,7 +87,10 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "Sales.Orders"
+			"table": {
+				"value": "@dataset().SalesOrders",
+				"type": "Expression"
+			}
 		}
 	}
 }
