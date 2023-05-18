@@ -15,9 +15,25 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
 		},
+		"AzureDatabricks1_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'AzureDatabricks1'"
+		},
 		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
+		"LS_Blob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_Blob'"
+		},
+		"LS_SQLDatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_SQLDatabase'"
+		},
+		"LinkedService_SQLServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LinkedService_SQLServer'"
 		},
 		"OutputDatabase_connectionString": {
 			"type": "secureString",
@@ -30,6 +46,10 @@
 		"ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adlsstorageaccountwu.dfs.core.windows.net/"
+		},
+		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0512-190638-m073587v"
 		}
 	},
 	"variables": {
@@ -67,6 +87,24 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-6757626758552880.0.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDatabricks1_accessToken')]"
+					},
+					"existingClusterId": "[parameters('AzureDatabricks1_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -75,6 +113,50 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Blob')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_Blob_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SQLDatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_SQLDatabase_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LinkedService_SQLServer')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"dbName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('LinkedService_SQLServer_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -104,6 +186,46 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/xinyu1wu@gmail.com/12-Production-Workloads-with-Azure-Data-Factory",
+							"baseParameters": {
+								"runBy": "ADF"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ApplicationPeopleCSV')]",
@@ -1126,785 +1248,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SQLDB')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WatermarktableOrder')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"WatermarkOrder": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TableName",
-						"type": "varchar"
-					},
-					{
-						"name": "WatermarkValue",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": {
-						"value": "@dataset().WatermarkOrder",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/IncrementalLoad')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "LookupOldWaterMarkActivity",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select *\nfrom [dbo].[watermarktable]\nwhere TableName = 'Sales.Orders'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "WatermarktableOrder",
-								"type": "DatasetReference",
-								"parameters": {
-									"WatermarkOrder": "watermarktable"
-								}
-							}
-						}
-					},
-					{
-						"name": "LookupNewWaterMarkActivity",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select MAX(LastEditedWhen) as NewWatermarkvalue FROM [dbo].[Sales.Orders]",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SalesOrdersCSV",
-								"type": "DatasetReference",
-								"parameters": {
-									"SalesOrders": "Sales.Orders"
-								}
-							}
-						}
-					},
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "LookupOldWaterMarkActivity",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "LookupNewWaterMarkActivity",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select * from [dbo].[Sales.Orders] where LastEditedWhen > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' and LastEditedWhen <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "SalesOrdersCSV",
-								"type": "DatasetReference",
-								"parameters": {
-									"SalesOrders": "Sales.Orders"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OrderIncrementalLoad",
-								"type": "DatasetReference",
-								"parameters": {
-									"OrderIncrementalLoad": {
-										"value": "@concat('OrderIncrementalLoad-',utcnow(),'.csv')",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "sp_write_watermark",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Copy data1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_write_watermark]",
-							"storedProcedureParameters": {
-								"LastModifiedtime": {
-									"value": {
-										"value": "@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TableName": {
-									"value": {
-										"value": "@{activity('LookupOldWaterMarkActivity').output.firstRow.TableName}",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureSqlDatabase1",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/WatermarktableOrder')]",
-				"[concat(variables('factoryId'), '/datasets/SalesOrdersCSV')]",
-				"[concat(variables('factoryId'), '/datasets/OrderIncrementalLoad')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dataflow_WWI_order')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "SalesOrdersCSV",
-								"type": "DatasetReference"
-							},
-							"name": "SalesOrders"
-						},
-						{
-							"dataset": {
-								"referenceName": "SalesCustomersCSV",
-								"type": "DatasetReference"
-							},
-							"name": "SalesCustomers"
-						},
-						{
-							"dataset": {
-								"referenceName": "SalesOrderLinesCSV",
-								"type": "DatasetReference"
-							},
-							"name": "SalesOrderLines"
-						},
-						{
-							"dataset": {
-								"referenceName": "DIMorder",
-								"type": "DatasetReference"
-							},
-							"name": "DIMorder"
-						},
-						{
-							"dataset": {
-								"referenceName": "DIMorder",
-								"type": "DatasetReference"
-							},
-							"name": "MaxKey"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "DIMorder",
-								"type": "DatasetReference"
-							},
-							"name": "sink4"
-						},
-						{
-							"dataset": {
-								"referenceName": "DIMorder",
-								"type": "DatasetReference"
-							},
-							"name": "sink5"
-						},
-						{
-							"dataset": {
-								"referenceName": "DIMorder",
-								"type": "DatasetReference"
-							},
-							"name": "sink6"
-						}
-					],
-					"transformations": [
-						{
-							"name": "select1"
-						},
-						{
-							"name": "select2"
-						},
-						{
-							"name": "join1"
-						},
-						{
-							"name": "select3"
-						},
-						{
-							"name": "join2"
-						},
-						{
-							"name": "STGorder"
-						},
-						{
-							"name": "lookup1"
-						},
-						{
-							"name": "split1"
-						},
-						{
-							"name": "derivedColumn1"
-						},
-						{
-							"name": "select4"
-						},
-						{
-							"name": "derivedColumn2"
-						},
-						{
-							"name": "derivedColumn3"
-						},
-						{
-							"name": "filter1"
-						},
-						{
-							"name": "alterRow1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          OrderID as integer,",
-						"          CustomerID as integer,",
-						"          SalespersonPersonID as integer,",
-						"          PickedByPersonID as string,",
-						"          ContactPersonID as integer,",
-						"          BackorderOrderID as string,",
-						"          OrderDate as date,",
-						"          ExpectedDeliveryDate as date,",
-						"          CustomerPurchaseOrderNumber as integer,",
-						"          IsUndersupplyBackordered as integer,",
-						"          Comments as string,",
-						"          DeliveryInstructions as string,",
-						"          InternalComments as string,",
-						"          PickingCompletedWhen as string,",
-						"          LastEditedBy as integer,",
-						"          LastEditedWhen as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> SalesOrders",
-						"source(output(",
-						"          CustomerID as integer,",
-						"          CustomerName as string,",
-						"          BillToCustomerID as integer,",
-						"          CustomerCategoryID as integer,",
-						"          BuyingGroupID as string,",
-						"          PrimaryContactPersonID as integer,",
-						"          AlternateContactPersonID as string,",
-						"          DeliveryMethodID as integer,",
-						"          DeliveryCityID as integer,",
-						"          PostalCityID as integer,",
-						"          CreditLimit as string,",
-						"          AccountOpenedDate as date,",
-						"          StandardDiscountPercentage as double,",
-						"          IsStatementSent as integer,",
-						"          IsOnCreditHold as integer,",
-						"          PaymentDays as integer,",
-						"          PhoneNumber as string,",
-						"          FaxNumber as string,",
-						"          DeliveryRun as string,",
-						"          RunPosition as string,",
-						"          WebsiteURL as string,",
-						"          DeliveryAddressLine1 as string,",
-						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          DeliveryLocation as string,",
-						"          PostalAddressLine1 as string,",
-						"          PostalAddressLine2 as string,",
-						"          PostalPostalCode as integer,",
-						"          LastEditedBy as integer",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> SalesCustomers",
-						"source(output(",
-						"          OrderLineID as integer,",
-						"          OrderID as integer,",
-						"          StockItemID as integer,",
-						"          Description as string,",
-						"          PackageTypeID as integer,",
-						"          Quantity as integer,",
-						"          UnitPrice as double,",
-						"          TaxRate as double,",
-						"          PickedQuantity as integer,",
-						"          PickingCompletedWhen as string,",
-						"          LastEditedBy as integer,",
-						"          LastEditedWhen as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> SalesOrderLines",
-						"source(output(",
-						"          order_key as integer,",
-						"          OrderID as integer,",
-						"          CustomerID as integer,",
-						"          CustomerName as string,",
-						"          PhoneNumber as string,",
-						"          Description as string,",
-						"          Quantity as integer,",
-						"          UnitPrice as double,",
-						"          TaxRate as double,",
-						"          OrderDate as date,",
-						"          ExpectedDeliveryDate as date,",
-						"          CustomerPurchaseOrderNumber as integer,",
-						"          DeliveryAddressLine1 as string,",
-						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Isactive as integer",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> DIMorder",
-						"source(output(",
-						"          order_key as integer,",
-						"          OrderID as integer,",
-						"          CustomerID as integer,",
-						"          CustomerName as string,",
-						"          PhoneNumber as string,",
-						"          Description as string,",
-						"          Quantity as integer,",
-						"          UnitPrice as double,",
-						"          TaxRate as double,",
-						"          OrderDate as date,",
-						"          ExpectedDeliveryDate as date,",
-						"          CustomerPurchaseOrderNumber as integer,",
-						"          DeliveryAddressLine1 as string,",
-						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Isactive as integer",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     query: 'select max([OrderId]) as MaxKey\\n  from [dbo].[dim_order]',",
-						"     format: 'query') ~> MaxKey",
-						"SalesOrders select(mapColumn(",
-						"          OrderID,",
-						"          CustomerID,",
-						"          SalespersonPersonID,",
-						"          PickedByPersonID,",
-						"          ContactPersonID,",
-						"          BackorderOrderID,",
-						"          OrderDate,",
-						"          ExpectedDeliveryDate,",
-						"          CustomerPurchaseOrderNumber,",
-						"          PickingCompletedWhen,",
-						"          LastEditedBy,",
-						"          LastEditedWhen",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"SalesCustomers select(mapColumn(",
-						"          CustomerID,",
-						"          CustomerName,",
-						"          BillToCustomerID,",
-						"          CustomerCategoryID,",
-						"          BuyingGroupID,",
-						"          PhoneNumber,",
-						"          DeliveryAddressLine1,",
-						"          DeliveryAddressLine2,",
-						"          DeliveryPostalCode,",
-						"          PostalAddressLine1,",
-						"          PostalAddressLine2,",
-						"          PostalPostalCode,",
-						"          LastEditedBy",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select2",
-						"select1, select2 join(select1@CustomerID == select2@CustomerID,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
-						"join1 select(mapColumn(",
-						"          OrderID,",
-						"          CustomerID = select1@CustomerID,",
-						"          CustomerName,",
-						"          OrderDate,",
-						"          ExpectedDeliveryDate,",
-						"          CustomerPurchaseOrderNumber,",
-						"          PhoneNumber,",
-						"          DeliveryAddressLine1,",
-						"          DeliveryAddressLine2,",
-						"          DeliveryPostalCode",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select3",
-						"select3, SalesOrderLines join(select3@OrderID == SalesOrderLines@OrderID,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join2",
-						"join2 select(mapColumn(",
-						"          OrderID = select3@OrderID,",
-						"          CustomerID,",
-						"          CustomerName,",
-						"          PhoneNumber,",
-						"          Description,",
-						"          Quantity,",
-						"          UnitPrice,",
-						"          TaxRate,",
-						"          OrderDate,",
-						"          ExpectedDeliveryDate,",
-						"          CustomerPurchaseOrderNumber,",
-						"          DeliveryAddressLine1,",
-						"          DeliveryAddressLine2,",
-						"          DeliveryPostalCode",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> STGorder",
-						"STGorder, select4 lookup(CustomerID == DimCustomerID,",
-						"     multiple: false,",
-						"     pickup: 'any',",
-						"     broadcast: 'auto')~> lookup1",
-						"lookup1 split(isNull(DimOrderID),",
-						"     disjoint: false) ~> split1@(New, Exist)",
-						"split1@New derive(isactiveinsert = 1) ~> derivedColumn1",
-						"DIMorder select(mapColumn(",
-						"          Dimorder_key = order_key,",
-						"          DimOrderID = OrderID,",
-						"          DimCustomerID = CustomerID,",
-						"          DimCustomerName = CustomerName,",
-						"          DimPhoneNumber = PhoneNumber,",
-						"          DimDescription = Description,",
-						"          DimQuantity = Quantity,",
-						"          DimUnitPrice = UnitPrice,",
-						"          DimTaxRate = TaxRate,",
-						"          DimOrderDate = OrderDate,",
-						"          DimExpectedDeliveryDate = ExpectedDeliveryDate,",
-						"          DimCustomerPurchaseOrderNumber = CustomerPurchaseOrderNumber,",
-						"          DimDeliveryAddressLine1 = DeliveryAddressLine1,",
-						"          DimDeliveryAddressLine2 = DeliveryAddressLine2,",
-						"          DimDeliveryPostalCode = DeliveryPostalCode,",
-						"          DimIsactive = Isactive",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select4",
-						"split1@Exist derive(isactiveinsert = 1) ~> derivedColumn2",
-						"split1@Exist derive(isactiveUpdate = 0) ~> derivedColumn3",
-						"derivedColumn3 filter((OrderID == DimOrderID) && (CustomerID != DimCustomerID || CustomerName !=DimCustomerName)) ~> filter1",
-						"filter1 alterRow(updateIf((OrderID==DimOrderID)&&(CustomerID!=DimCustomerID||CustomerName!=DimCustomerName))) ~> alterRow1",
-						"derivedColumn1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          order_key as integer,",
-						"          OrderID as integer,",
-						"          CustomerID as integer,",
-						"          CustomerName as string,",
-						"          PhoneNumber as string,",
-						"          Description as string,",
-						"          Quantity as integer,",
-						"          UnitPrice as double,",
-						"          TaxRate as double,",
-						"          OrderDate as date,",
-						"          ExpectedDeliveryDate as date,",
-						"          CustomerPurchaseOrderNumber as integer,",
-						"          DeliveryAddressLine1 as string,",
-						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Isactive as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          OrderID,",
-						"          CustomerID,",
-						"          CustomerName,",
-						"          PhoneNumber,",
-						"          Description,",
-						"          Quantity,",
-						"          UnitPrice,",
-						"          TaxRate,",
-						"          OrderDate,",
-						"          ExpectedDeliveryDate,",
-						"          CustomerPurchaseOrderNumber,",
-						"          DeliveryAddressLine1,",
-						"          DeliveryAddressLine2,",
-						"          DeliveryPostalCode,",
-						"          Isactive = isactiveinsert",
-						"     )) ~> sink4",
-						"derivedColumn2 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          order_key as integer,",
-						"          OrderID as integer,",
-						"          CustomerID as integer,",
-						"          CustomerName as string,",
-						"          PhoneNumber as string,",
-						"          Description as string,",
-						"          Quantity as integer,",
-						"          UnitPrice as double,",
-						"          TaxRate as double,",
-						"          OrderDate as date,",
-						"          ExpectedDeliveryDate as date,",
-						"          CustomerPurchaseOrderNumber as integer,",
-						"          DeliveryAddressLine1 as string,",
-						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Isactive as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          OrderID,",
-						"          CustomerID,",
-						"          CustomerName,",
-						"          PhoneNumber,",
-						"          Description,",
-						"          Quantity,",
-						"          UnitPrice,",
-						"          TaxRate,",
-						"          OrderDate,",
-						"          ExpectedDeliveryDate,",
-						"          CustomerPurchaseOrderNumber,",
-						"          DeliveryAddressLine1,",
-						"          DeliveryAddressLine2,",
-						"          DeliveryPostalCode,",
-						"          Isactive = isactiveinsert",
-						"     )) ~> sink5",
-						"alterRow1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          order_key as integer,",
-						"          OrderID as integer,",
-						"          CustomerID as integer,",
-						"          CustomerName as string,",
-						"          PhoneNumber as string,",
-						"          Description as string,",
-						"          Quantity as integer,",
-						"          UnitPrice as double,",
-						"          TaxRate as double,",
-						"          OrderDate as date,",
-						"          ExpectedDeliveryDate as date,",
-						"          CustomerPurchaseOrderNumber as integer,",
-						"          DeliveryAddressLine1 as string,",
-						"          DeliveryAddressLine2 as string,",
-						"          DeliveryPostalCode as integer,",
-						"          Isactive as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:true,",
-						"     upsertable:false,",
-						"     keys:['order_key'],",
-						"     format: 'table',",
-						"     preSQLs:['set IDENTITY_insert Dimorder_key on;'],",
-						"     postSQLs:['set IDENTITY_insert Dimorder_key off;'],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          OrderID = DimOrderID,",
-						"          CustomerID = DimCustomerID,",
-						"          CustomerName = DimCustomerName,",
-						"          PhoneNumber = DimPhoneNumber,",
-						"          Description = DimDescription,",
-						"          Quantity = DimQuantity,",
-						"          UnitPrice = DimUnitPrice,",
-						"          TaxRate = DimTaxRate,",
-						"          OrderDate = DimOrderDate,",
-						"          ExpectedDeliveryDate = DimExpectedDeliveryDate,",
-						"          CustomerPurchaseOrderNumber = DimCustomerPurchaseOrderNumber,",
-						"          DeliveryAddressLine1 = DimDeliveryAddressLine1,",
-						"          DeliveryAddressLine2 = DimDeliveryAddressLine2,",
-						"          DeliveryPostalCode = DimDeliveryPostalCode,",
-						"          Isactive = DimIsactive,",
-						"          order_key = Dimorder_key",
-						"     )) ~> sink6"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SalesOrdersCSV')]",
-				"[concat(variables('factoryId'), '/datasets/SalesCustomersCSV')]",
-				"[concat(variables('factoryId'), '/datasets/SalesOrderLinesCSV')]",
-				"[concat(variables('factoryId'), '/datasets/DIMorder')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/slowlychangingdimension')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "dataflow_WWI_order",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow_WWI_order",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"SalesOrders": {
-										"SalesOrders": "Sales.Orders"
-									},
-									"SalesCustomers": {},
-									"SalesOrderLines": {},
-									"DIMorder": {},
-									"MaxKey": {},
-									"sink4": {},
-									"sink5": {},
-									"sink6": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow_WWI_order')]"
 			]
 		}
 	]

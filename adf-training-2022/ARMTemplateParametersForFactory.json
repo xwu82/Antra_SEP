@@ -11,7 +11,19 @@
 		"AzureBlobStorage1_connectionString": {
 			"value": ""
 		},
+		"AzureDatabricks1_accessToken": {
+			"value": ""
+		},
 		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"LS_Blob_connectionString": {
+			"value": ""
+		},
+		"LS_SQLDatabase_connectionString": {
+			"value": ""
+		},
+		"LinkedService_SQLServer_connectionString": {
 			"value": ""
 		},
 		"OutputDatabase_connectionString": {
@@ -22,6 +34,9 @@
 		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"value": "https://adlsstorageaccountwu.dfs.core.windows.net/"
+		},
+		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
+			"value": "0512-190638-m073587v"
 		}
 	}
 }
